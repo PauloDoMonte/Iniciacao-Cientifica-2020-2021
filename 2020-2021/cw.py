@@ -81,12 +81,12 @@ def hist_ci(alt,r0,rR,pitch_inicial,pitch_final,yaw_inicial,yaw_final,t0,tf):
 					if(rh/(alt+raio_terra) < rR):	k+=1
 					if(k>=tc-0.1):
 						if((v0>0)and(v0<=1))		: hist[0]+=2
-						elif((v0>1)and(v0<=2.5))	: hist[0]+=2
-						elif((v0>2.5)and(v0<=4))	: hist[0]+=2
-						elif((v0>4)and(v0<=5.5))	: hist[0]+=2
-						elif((v0>5.5)and(v0<=7.5))	: hist[0]+=2
-						elif((v0>7.5)and(v0<=8.5))	: hist[0]+=2
-						elif((v0>8.5)and(v0<=11))	: hist[0]+=2
-						elif((v0>11)and(v0<=20))	: hist[0]+=2
+						elif((v0>1)and(v0<=2.5))	: hist[1]+=2
+						elif((v0>2.5)and(v0<=4))	: hist[2]+=2
+						elif((v0>4)and(v0<=5.5))	: hist[3]+=2
+						elif((v0>5.5)and(v0<=7.5))	: hist[4]+=2
+						elif((v0>7.5)and(v0<=8.5))	: hist[5]+=2
+						elif((v0>8.5)and(v0<=11))	: hist[6]+=2
+						elif((v0>11)and(v0<=20))	: hist[7]+=2
 	dados = pandas.DataFrame({"Data":hist,"V0":v0_hist})
 	print(dados)
