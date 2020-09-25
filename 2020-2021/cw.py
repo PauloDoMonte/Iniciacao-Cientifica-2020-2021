@@ -1,4 +1,8 @@
-import math,pandas
+import math
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
 '''
 xh,yh,zh    ->  x(t) homogeneo,y(t) homogeneo,z(t) homogeneo, (Tempo de simulacao[s])
 vxh,vyh,vzh ->  vxh(t) homogeneo,vyh(t) homogeneo,vzh(t) homogeneo, (Tempo de simulacao[s])
@@ -21,7 +25,7 @@ def xh(x0,y0,z0,vx0,vy0,vz0,t,w):
 	return( ((vx0/w)*a(w,t)) - ((2.)*vy0/w+(3.)*x0)*b(w,t) + ((2.)*vy0/w+(4.)*x0) )
 
 def yh(x0,y0,z0,vx0,vy0,vz0,t,w):
-	return( ((2.)*vx0/w)*b(w,t) + ((4.)*vy0/w+(6.)*x0)*a(w,t) + (y0-(2.)*vx0/w) - ((3.)*vy0+(6.)*w*x0)*t )
+	return( ((2.)*vx0/w)*b(w,t) + ((4.)*vy0/w+(6.)*x0)*a(w,t) + (y0-(2.)*vx0/w) - ((3.)*y0+(6.)*w*x0)*t )
 
 def zh(x0,y0,z0,vx0,vy0,vz0,t,w):
 	return( z0*b(w,t) + (vz0/w)*a(w,t) )
@@ -88,5 +92,202 @@ def hist_ci(alt,r0,rR,pitch_inicial,pitch_final,yaw_inicial,yaw_final,t0,tf):
 						elif((v0>7.5)and(v0<=8.5))	: hist[5]+=2
 						elif((v0>8.5)and(v0<=11))	: hist[6]+=2
 						elif((v0>11)and(v0<=20))	: hist[7]+=2
-	dados = pandas.DataFrame({"Data":hist,"V0":v0_hist})
+	dados = pd.DataFrame({"Data":hist,"V0":v0_hist})
 	print(dados)
+	
+def cinematic(alt,pitch,yaw,r0,t0,tf,vx0,vy0,vz0,graf):
+	
+	w_ = w(alt)
+
+	x0_ = x0(pitch,yaw,r0)
+	y0_ = y0(pitch,yaw,r0)
+	z0_ = z0(pitch,yaw,r0)
+	
+	xt = np.zeros(tf - t0 + 1)
+	yt = np.zeros(tf - t0 + 1)
+	zt = np.zeros(tf - t0 + 1)
+	
+	vxt = np.zeros(tf - t0 + 1)
+	vyt = np.zeros(tf - t0 + 1)
+
+	vzt = np.zeros(tf - t0 + 1)	
+
+	tempo = np.zeros(tf - t0 + 1)
+	
+	r = np.zeros(tf - t0 + 1)
+	v = np.zeros(tf - t0 + 1)
+	
+	for t in range (t0 , tf + 1):
+
+		tempo[t] = t
+		
+		xt[t] = xh(x0_,y0_,z0_,vx0,vy0,vz0,t,w_)
+		yt[t] = yh(x0_,y0_,z0_,vx0,vy0,vz0,t,w_)
+		zt[t] = zh(x0_,y0_,z0_,vx0,vy0,vz0,t,w_)
+		
+		vxt[t] = vxh(x0_,y0_,z0_,vx0,vy0,vz0,t,w_)
+		vyt[t] = vyh(x0_,y0_,z0_,vx0,vy0,vz0,t,w_)
+		vzt[t] = vzh(x0_,y0_,z0_,vx0,vy0,vz0,t,w_)
+		
+		r[t] = math.sqrt(xt[t]**2+yt[t]**2+zt[t]**2)
+		v[t] = math.sqrt(vxt[t]**2+vyt[t]**2+vzt[t]**2)
+		
+	Data = pd.DataFrame({'TEMPO': tempo, 'X[t]': xt, 'Y[t]': yt, 'Z[t]': zt, 'VXT': vxt, 'VYT': vyt, 'VZT': vzt, 'R[t]': r, 'V[t]': v})
+	
+	if(graf == 1):
+		plt.figure(figsize = (8,6))
+		
+		plt.subplot(1,2,1)
+		plt.plot(Data['TEMPO'],Data['R[t]'])
+		plt.xlabel('Tempo [s]') 
+		plt.ylabel('Distância [km]')
+		plt.title('Distância relativa em função do tempo [km]')
+		plt.grid(True)
+		
+		plt.subplot(1,2,2)
+		plt.plot(Data['TEMPO'],Data['V[t]'])
+		plt.xlabel('Tempo [s]') 
+		plt.ylabel('Velocidade [km]')
+		plt.title('Velocidade relativa em função do tempo [km/s]')
+		plt.grid(True)
+		
+		plt.show()
+
+	return(Data)
+
+def cinematic_c(alt,pitch,yaw,r0,t0,tf,graf):
+	
+	w_ = w(alt)
+
+	x0_ = x0(pitch,yaw,r0)
+	y0_ = y0(pitch,yaw,r0)
+	z0_ = z0(pitch,yaw,r0)
+	
+	t = tf
+	
+	vy0_ = vy0(x0_,y0_,z0_,vx0,vy0,vz0,t,w_)
+	vx0_ = vx0(x0_,y0_,z0_,vx0,vy0_,vz0,t,w_)
+	vz0_ = vz0(x0_,y0_,z0_,vx0,vy0,vz0,t,w_)
+	
+	xt = np.zeros(tf - t0 + 1)
+	yt = np.zeros(tf - t0 + 1)
+	zt = np.zeros(tf - t0 + 1)
+	
+	vxt = np.zeros(tf - t0 + 1)
+	vyt = np.zeros(tf - t0 + 1)
+
+	vzt = np.zeros(tf - t0 + 1)	
+
+	tempo = np.zeros(tf - t0 + 1)
+	
+	r = np.zeros(tf - t0 + 1)
+	v = np.zeros(tf - t0 + 1)
+	
+	for t in range (t0 , tf + 1):
+
+		tempo[t] = t
+		
+		xt[t] = xh(x0_,y0_,z0_,vx0_,vy0_,vz0_,t,w_)
+		yt[t] = yh(x0_,y0_,z0_,vx0_,vy0_,vz0_,t,w_)
+		zt[t] = zh(x0_,y0_,z0_,vx0_,vy0_,vz0_,t,w_)
+		
+		vxt[t] = vxh(x0_,y0_,z0_,vx0_,vy0_,vz0_,t,w_)
+		vyt[t] = vyh(x0_,y0_,z0_,vx0_,vy0_,vz0_,t,w_)
+		vzt[t] = vzh(x0_,y0_,z0_,vx0_,vy0_,vz0_,t,w_)
+		
+		r[t] = math.sqrt(xt[t]**2+yt[t]**2+zt[t]**2)
+		v[t] = math.sqrt(vxt[t]**2+vyt[t]**2+vzt[t]**2)
+		
+	Data = pd.DataFrame({'TEMPO': tempo, 'X[t]': xt, 'Y[t]': yt, 'Z[t]': zt, 'VXT': vxt, 'VYT': vyt, 'VZT': vzt, 'R[t]': r, 'V[t]': v})
+	
+	if(graf == 1):
+		plt.figure(figsize = (8,6))
+		
+		plt.subplot(1,2,1)
+		plt.plot(Data['TEMPO'],Data['R[t]'])
+		plt.xlabel('Tempo [s]') 
+		plt.ylabel('Distância [km]')
+		plt.title('Distância relativa em função do tempo [km]')
+		plt.grid(True)
+		
+		plt.subplot(1,2,2)
+		plt.plot(Data['TEMPO'],Data['V[t]'])
+		plt.xlabel('Tempo [s]') 
+		plt.ylabel('Velocidade [km]')
+		plt.title('Velocidade relativa em função do tempo [km/s]')
+		plt.grid(True)
+		
+		plt.show()
+
+	return(Data)
+
+def calc_volatility(dataframe):
+
+	tamanho = len(dataframe)
+	alfa = 0
+	
+	for i in range(1,tamanho-1):
+		alfa = alfa + dataframe['R[t]'][i+1] - dataframe['R[t]'][i]
+	
+	k = alfa/tamanho
+	return(dataframe['X[t]'][0],dataframe['Y[t]'][0],dataframe['Z[t]'][0],k)
+
+def cinematic2(alt,x0,y0,z0,r0,t0,tf,vx0,vy0,vz0,graf):
+	
+	w_ = w(alt)
+
+	x0_ = x0
+	y0_ = y0
+	z0_ = z0
+	
+	xt = np.zeros(tf - t0 + 1)
+	yt = np.zeros(tf - t0 + 1)
+	zt = np.zeros(tf - t0 + 1)
+	
+	vxt = np.zeros(tf - t0 + 1)
+	vyt = np.zeros(tf - t0 + 1)
+
+	vzt = np.zeros(tf - t0 + 1)	
+
+	tempo = np.zeros(tf - t0 + 1)
+	
+	r = np.zeros(tf - t0 + 1)
+	v = np.zeros(tf - t0 + 1)
+	
+	for t in range (t0 , tf + 1):
+
+		tempo[t] = t
+		
+		xt[t] = xh(x0_,y0_,z0_,vx0,vy0,vz0,t,w_)
+		yt[t] = yh(x0_,y0_,z0_,vx0,vy0,vz0,t,w_)
+		zt[t] = zh(x0_,y0_,z0_,vx0,vy0,vz0,t,w_)
+		
+		vxt[t] = vxh(x0_,y0_,z0_,vx0,vy0,vz0,t,w_)
+		vyt[t] = vyh(x0_,y0_,z0_,vx0,vy0,vz0,t,w_)
+		vzt[t] = vzh(x0_,y0_,z0_,vx0,vy0,vz0,t,w_)
+		
+		r[t] = math.sqrt(xt[t]**2+yt[t]**2+zt[t]**2)
+		v[t] = math.sqrt(vxt[t]**2+vyt[t]**2+vzt[t]**2)
+		
+	Data = pd.DataFrame({'TEMPO': tempo, 'X[t]': xt, 'Y[t]': yt, 'Z[t]': zt, 'VXT': vxt, 'VYT': vyt, 'VZT': vzt, 'R[t]': r, 'V[t]': v})
+	
+	if(graf == 1):
+		plt.figure(figsize = (8,6))
+		
+		plt.subplot(1,2,1)
+		plt.plot(Data['TEMPO'],Data['R[t]'])
+		plt.xlabel('Tempo [s]') 
+		plt.ylabel('Distância [km]')
+		plt.title('Distância relativa em função do tempo [km]')
+		plt.grid(True)
+		
+		plt.subplot(1,2,2)
+		plt.plot(Data['TEMPO'],Data['R[t]'])
+		plt.xlabel('Tempo [s]') 
+		plt.ylabel('Velocidade [km]')
+		plt.title('Velocidade relativa em função do tempo [km/s]')
+		plt.grid(True)
+		
+		plt.show()
+
+	return(Data)
