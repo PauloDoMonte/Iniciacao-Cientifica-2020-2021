@@ -121,12 +121,18 @@ def vz0(x0,y0,z0,vy0,t,w):
 
 # Calcula a velocidade inicial em x para ter um x final = xr
 def vx0_(xr,x0,vy0,t,w):
-	return( (xr + vy0*((2*b(w,t)-2)/w) + x0*(3*b(w,t)-4))*(w/a(w,t)) )
+	return( (xr +  vy0*((2*b(w,t)-2)/w) + x0*(3*b(w,t)-4))*(w/a(w,t)) )
 
 # Calcula a velocidade inicial em y para ter um y final = yr
 def vy0_(xr,yr,x0,y0,t,w):
-	return( ((6*x0*a(w,t)) -(xr*2*b(w,t)) - ((2*x0*b(w,t))/a(w,t)) - (6*w*x0*t) + (y0) - ((2*xr)/a(w,t)) + ((2*x0)/a(w,t)) - (yr))/ ( - ((4*a(w,t))/w) - ((4*b(w,t))/(w*a(w,t))) - ((4*b(w,t))/a(w,t)) + 3*t) )
-
+	
+	A = 6*x0*a(w,t) - 6*w*x0*t
+	B = ((4*a(w,t))/w) - 3*t
+	C = ((w*xr)/a(w,t)) + ((3*w*x0*b(w,t))/a(w,t)) - ((4*w*x0)/a(w,t))
+	numerador = ((-2*C*(b(w,t)-1))/w) -A + yr
+	denominador = B + ((4*(b(w,t)-1)*(b(w,t)-1))/(w*a(w,t)))
+	return(numerador/denominador)
+	
 # Calcula a velocidade inicial em z para ter um z final = zr
 def vz0_(zr,z0,t,w):
 	return( (zr*w)/a(w,t) - (z0*b(w,t)*w)/a(w,t) )
@@ -291,9 +297,9 @@ def cinematica_colisao(alt,pitch,yaw,r0,t0,tf,graf):
 
 	t = tf
 
-	vy0_ = vy0(x0_,y0_,t,w_)
-	vx0_ = vx0(x0_,vy0_,t,w_)
-	vz0_ = vz0(z0_,t,w_)
+	vy0_ = vy0(x0_,y0_,z0_,t,w_)
+	vx0_ = vx0(x0_,y0_,z0_,vy0_,t,w_)
+	vz0_ = vz0(z0_,y0_,z0_,vy0_,t,w_)
 
 	xt = np.zeros(tf - t0 + 1)
 	yt = np.zeros(tf - t0 + 1)
@@ -424,3 +430,4 @@ def cinematica_cartesiano(alt,x0,y0,z0,r0,t0,tf,vx0,vy0,vz0,graf):
 
 	return(Data)
 # cw.histograma_naocolisao(220,r0,100/cw.raio_terra,-90,0,0,180,1,3000)
+
