@@ -150,8 +150,8 @@ def histograma_colisao(alt,r0,rR,pitch_inicial,pitch_final,yaw_inicial,yaw_final
 		print("Carregando: {}/{}".format(pitch,pitch_final))
 		for yaw in range(yaw_inicial,yaw_final):
 			x0_ = x0(pitch,yaw,r0)
-			y0_ = x0(pitch,yaw,r0)
-			z0_ = x0(pitch,yaw,r0)
+			y0_ = y0(pitch,yaw,r0)
+			z0_ = z0(pitch,yaw,r0)
 			for tc in range(t0,tf):
 				vy0_ = vy0(x0_,y0_,tc,w_)
 				vx0_ = vx0(x0_,vy0_,tc,w_)
@@ -161,7 +161,7 @@ def histograma_colisao(alt,r0,rR,pitch_inicial,pitch_final,yaw_inicial,yaw_final
 				for t in range(0,tc):
 					xh_ = xh(x0_,y0_,z0_,vx0_,vy0_,vz0_,t,w_)
 					yh_ = yh(x0_,y0_,z0_,vx0_,vy0_,vz0_,t,w_)
-					zh_ = xh(x0_,y0_,z0_,vx0_,vy0_,vz0_,t,w_)
+					zh_ = zh(x0_,y0_,z0_,vx0_,vy0_,vz0_,t,w_)
 					rh = math.sqrt((xh_*xh_)+(yh_*yh_)+(zh_*zh_))
 					if(rh/(alt+raio_terra) <= rR):	k+=1
 					if(k>=tc-0.1):
@@ -198,8 +198,8 @@ def histograma_naocolisao(alt,r0,rR,pitch_inicial,pitch_final,yaw_inicial,yaw_fi
 			arquivo.close()
 			for yaw in range(yaw_inicial,yaw_final):
 				x0_ = x0(pitch,yaw,r0)
-				y0_ = x0(pitch,yaw,r0)
-				z0_ = x0(pitch,yaw,r0)
+				y0_ = y0(pitch,yaw,r0)
+				z0_ = z0(pitch,yaw,r0)
 				for tc in range(t0,tf):
 					_vy0_ = vy0_(rf/math.sqrt(3),r0/math.sqrt(3),x0_,y0_,tc,w_)
 					_vx0_ = vx0_(rf/math.sqrt(3),x0_,_vy0_,tc,w_)
@@ -208,7 +208,7 @@ def histograma_naocolisao(alt,r0,rR,pitch_inicial,pitch_final,yaw_inicial,yaw_fi
 					for t in range(0,tc):
 						xh_ = xh(x0_,y0_,z0_,_vx0_,_vy0_,_vz0_,t,w_)
 						yh_ = yh(x0_,y0_,z0_,_vx0_,_vy0_,_vz0_,t,w_)
-						zh_ = xh(x0_,y0_,z0_,_vx0_,_vy0_,_vz0_,t,w_)
+						zh_ = zh(x0_,y0_,z0_,_vx0_,_vy0_,_vz0_,t,w_)
 						rh = math.sqrt((xh_*xh_)+(yh_*yh_)+(zh_*zh_))
 						if(rh/(alt+raio_terra) <= rR):
 							k+=1
