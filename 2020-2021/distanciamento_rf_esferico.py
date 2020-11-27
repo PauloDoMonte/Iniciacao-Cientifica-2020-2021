@@ -61,10 +61,4 @@ se.heatmap(df_new)
 plt.title("Mapa do R final relativo em função dos pares de ângulos")
 plt.show()
 
-'''
-dt_new = dt.pivot(index='Pitch',columns='Yaw',values='Oscilação')
-dt_new.to_csv('distanciamento.csv', sep=",")
-se.heatmap(dt_new)
-plt.title("Mapa de oscilação da distância relativa em função dos pares de ângulos")
-plt.show()
-'''
+

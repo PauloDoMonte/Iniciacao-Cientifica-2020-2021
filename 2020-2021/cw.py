@@ -429,5 +429,46 @@ def cinematica_cartesiano(alt,x0,y0,z0,r0,t0,tf,vx0,vy0,vz0,graf):
 		plt.show()
 
 	return(Data)
-# cw.histograma_naocolisao(220,r0,100/cw.raio_terra,-90,0,0,180,1,3000)
+
+
+def hist_relacionado(alt,r0):
+
+	hist = np.zeros(11)
+	v0_ = np.linspace(-40,40,4000)
+	
+	for pitch in range(-90,90):
+		for yaw in range(0,360):
+			
+			print("Carregando Pitch {} Yaw {}".format(pitch,yaw))
+			
+			print(hist)
+			
+			for v0 in v0_:
+				
+				vx0_ = v0/math.sqrt(3)
+				vy0_ = v0/math.sqrt(3)
+				vz0_ = v0/math.sqrt(3)
+	
+				Data = cinematica_esferica(alt,pitch,yaw,3,0,3000,vx0_,vy0_,vz0_,0)
+				
+				k = 0
+				
+				for t in range (0,2999):
+					
+					if (Data['R[t]'][t] <= 100): k += 1
+				
+				if (k >= 2998):
+					if((Data['R[t]'][2999]==0)): hist[0]+=1
+					elif((Data['R[t]'][2999]>0)and(Data['R[t]'][2999]<=10)): hist[1]+=1
+					elif((Data['R[t]'][2999]>10)and(Data['R[t]'][2999]<=20)): hist[2]+=1
+					elif((Data['R[t]'][2999]>20)and(Data['R[t]'][2999]<=30)): hist[3]+=1
+					elif((Data['R[t]'][2999]>30)and(Data['R[t]'][2999]<=40)): hist[4]+=1
+					elif((Data['R[t]'][2999]>40)and(Data['R[t]'][2999]<=50)): hist[5]+=1
+					elif((Data['R[t]'][2999]>50)and(Data['R[t]'][2999]<=60)): hist[6]+=1
+					elif((Data['R[t]'][2999]>60)and(Data['R[t]'][2999]<=70)): hist[7]+=1
+					elif((Data['R[t]'][2999]>70)and(Data['R[t]'][2999]<=80)): hist[8]+=1
+					elif((Data['R[t]'][2999]>80)and(Data['R[t]'][2999]<=90)): hist[9]+=1
+					elif((Data['R[t]'][2999]>90)and(Data['R[t]'][2999]<=100)): hist[10]+=1
+					
+#cw.hist_relacionado(220,3,-90,90,0,360,-2,2)
 
