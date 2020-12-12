@@ -434,41 +434,72 @@ def cinematica_cartesiano(alt,x0,y0,z0,r0,t0,tf,vx0,vy0,vz0,graf):
 def hist_relacionado(alt,r0):
 
 	hist = np.zeros(11)
-	v0_ = np.linspace(-40,40,4000)
+	v0_ = np.linspace(-40,40,10)
+	
+	caminho = 'output_{}'.format(r0)
+	arquivo = open(caminho, 'w') # Abre novamente o arquivo (escrita)
+	arquivo.writelines('R0:{}\n'.format(r0))    # escreva o conteúdo criado anteriormente nele.
+	arquivo.close()	
 	
 	for pitch in range(-90,90):
 		for yaw in range(0,360):
 			
 			print("Carregando Pitch {} Yaw {}".format(pitch,yaw))
-			
 			print(hist)
-			
-			for v0 in v0_:
-				
-				vx0_ = v0/math.sqrt(3)
-				vy0_ = v0/math.sqrt(3)
-				vz0_ = v0/math.sqrt(3)
-	
-				Data = cinematica_esferica(alt,pitch,yaw,3,0,3000,vx0_,vy0_,vz0_,0)
-				
-				k = 0
-				
-				for t in range (0,2999):
-					
-					if (Data['R[t]'][t] <= 100): k += 1
-				
-				if (k >= 2998):
-					if((Data['R[t]'][2999]==0)): hist[0]+=1
-					elif((Data['R[t]'][2999]>0)and(Data['R[t]'][2999]<=10)): hist[1]+=1
-					elif((Data['R[t]'][2999]>10)and(Data['R[t]'][2999]<=20)): hist[2]+=1
-					elif((Data['R[t]'][2999]>20)and(Data['R[t]'][2999]<=30)): hist[3]+=1
-					elif((Data['R[t]'][2999]>30)and(Data['R[t]'][2999]<=40)): hist[4]+=1
-					elif((Data['R[t]'][2999]>40)and(Data['R[t]'][2999]<=50)): hist[5]+=1
-					elif((Data['R[t]'][2999]>50)and(Data['R[t]'][2999]<=60)): hist[6]+=1
-					elif((Data['R[t]'][2999]>60)and(Data['R[t]'][2999]<=70)): hist[7]+=1
-					elif((Data['R[t]'][2999]>70)and(Data['R[t]'][2999]<=80)): hist[8]+=1
-					elif((Data['R[t]'][2999]>80)and(Data['R[t]'][2999]<=90)): hist[9]+=1
-					elif((Data['R[t]'][2999]>90)and(Data['R[t]'][2999]<=100)): hist[10]+=1
-					
-#cw.hist_relacionado(220,3,-90,90,0,360,-2,2)
 
+			arquivo = open(caminho, 'r') 																						# Abra o arquivo (leitura)
+			conteudo = arquivo.readlines()
+			conteudo.append('{}:\t{}\t{}\t{}\n'.format(hist,pitch,yaw,datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")))   # insira seu conteúdo
+			arquivo = open(caminho, 'w') 																						# Abre novamente o arquivo (escrita)
+			arquivo.writelines(conteudo)    																					# escreva o conteúdo criado anteriormente nele.
+			arquivo.close()
+			
+			for tf in range(1,3000):
+			
+				
+				for v0 in v0_:
+
+					vx0_ = v0/math.sqrt(3)
+					vy0_ = v0/math.sqrt(3)
+					vz0_ = v0/math.sqrt(3)
+
+					Data = cinematica_esferica(alt,pitch,yaw,3,0,tf,vx0_,vy0_,vz0_,0)
+
+					k = 0
+
+					for t in range (0,tf):
+
+						if (Data['R[t]'][t] <= 100): k += 1
+
+					if (k >= tf - 1.1):
+						if((Data['R[t]'][tf]==0)): hist[0]+=1
+						elif((Data['R[t]'][tf]>0)and(Data['R[t]'][tf]<=10)): hist[1]+=1
+						elif((Data['R[t]'][tf]>10)and(Data['R[t]'][tf]<=20)): hist[2]+=1
+						elif((Data['R[t]'][tf]>20)and(Data['R[t]'][tf]<=30)): hist[3]+=1
+						elif((Data['R[t]'][tf]>30)and(Data['R[t]'][tf]<=40)): hist[4]+=1
+						elif((Data['R[t]'][tf]>40)and(Data['R[t]'][tf]<=50)): hist[5]+=1
+						elif((Data['R[t]'][tf]>50)and(Data['R[t]'][tf]<=60)): hist[6]+=1
+						elif((Data['R[t]'][tf]>60)and(Data['R[t]'][tf]<=70)): hist[7]+=1
+						elif((Data['R[t]'][tf]>70)and(Data['R[t]'][tf]<=80)): hist[8]+=1
+						elif((Data['R[t]'][tf]>80)and(Data['R[t]'][tf]<=90)): hist[9]+=1
+						elif((Data['R[t]'][tf]>90)and(Data['R[t]'][tf]<=100)): hist[10]+=1
+						
+def r_med(x0_,y0_,z0_,vx0_,vy0_,vz0_,alt):
+
+	w_ = w(alt)
+	
+	A = x0_
+	B = vx0_/w_
+	C = (4*vy0_/w_) + 6*x0_
+	D = 2*vx0_/w_
+	E = y0_ - (2*vx0_/w_)
+	F = z0_
+	G = vz0_/w_
+	
+	x_med = ((A**2)/2)+((B**2)/2)
+	y_med = ((C**2)/2)+((D**2)/2)+E**2
+	z_med = ((F**2)/2) + ((G**2)/2)
+	
+	r_med = x_med + y_med + z_med
+
+	return(r_med)
